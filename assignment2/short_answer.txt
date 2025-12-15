@@ -5,7 +5,11 @@ Marriage Pact
 -------------
 
 Q1. It is your choice to use either an ordered or unordered set. In a few sentences, what are some of the tradeoffs between the two? Additionally, please give an example (that has not been shown in lecture) of a valid hash function that could be used to hash student names for an unordered set.
-A1. TODO
+A1. An ordered `std::set` keeps elements in sorted order and provides O(log n) insert/lookup time using a balanced tree; it is useful when you need the data ordered or need ordered traversal. An unordered `std::unordered_set` provides average O(1) insert/lookup time using hashing, which is usually faster for large datasets but can degrade to O(n) in worst-case hash-collision scenarios. `std::unordered_set` typically uses more memory for buckets. Example hash function for a full name (First Last): compute a rolling hash by iterating characters, combining with a prime multiplier, and mixing last-name length — e.g.:
+
+	size_t h = 1469598103934665603ULL; // FNV offset basis (example)
+	for (unsigned char c : name) h = (h ^ c) * 1099511628211ULL; // FNV-1a style mix
+	return h ^ (name.length() << 16);
 
 Q2. Note that we are saving pointers to names in the queue, not names themselves. Why might this be desired in this problem? What happens if the original set where the names are stored goes out of scope and the pointers are referenced?
-A2. TODO
+A2. Storing pointers avoids copying strings and keeps the queue lightweight; it also ensures all pointers refer to the single canonical string stored in the set, so updates or comparisons stay consistent. However, if the original set goes out of scope or is destroyed, the pointers become dangling and dereferencing them leads to undefined behavior (likely crashes or garbage data). To avoid this, the pointed-to storage must outlive any use of the pointers.
